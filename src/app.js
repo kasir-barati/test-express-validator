@@ -9,6 +9,7 @@ app.use(cors);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(require("./router/auth"));
 app.use(require("./middleware/404"));
 app.use(require("./middleware/error"));
 app.use(require("./middleware/500"));
