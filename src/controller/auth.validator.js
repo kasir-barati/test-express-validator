@@ -50,3 +50,28 @@ module.exports.verifyCodeValidator = check("verifyCode")
     min: VERIFICATION_CODE_LEN,
   })
   .withMessage("E_FORMAT_VERIFYCODE");
+
+module.exports.passwordValidator = check("password")
+  .notEmpty({ ignore_whitespace: true })
+  .withMessage("E_EMPTY_PASSWORD")
+  .bail()
+
+  .matches(/(?=.*[A-Z].*[A-Z])/)
+  .withMessage("E_UPPERCASE_LETTER_PASSWORD")
+
+  .matches(/(?=.*[a-z].*[a-z].*[a-z])/)
+  .withMessage("E_LOWERCASE_LETTER_PASSWORD")
+
+  .matches(/(?=.*[!@#$&*])/)
+  .withMessage("E_SPECIAL_CHARACTER_PASSWORD")
+
+  .matches(/(?=.*[0-9].*[0-9])/)
+  .withMessage("E_NUMBER_PASSWORD")
+
+  .isLength({ min: 8 })
+  .withMessage("E_MIN_LENGTH_PASSWORD")
+
+  .custom((password, { req }) => {
+    req.body.password = password;
+    return true;
+  });

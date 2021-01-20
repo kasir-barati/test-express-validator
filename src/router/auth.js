@@ -5,6 +5,10 @@ const authController = require("../controller/auth");
 const authValidator = require("../controller/auth.validator");
 
 router
+  .route("/auth/login2")
+  .post(authValidator.passwordValidator, validate, authController.postLogin);
+
+router
   .route("/auth/login")
   .post(authValidator.phoneNumberValidator, validate, authController.postLogin);
 router
