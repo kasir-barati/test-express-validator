@@ -1,0 +1,26 @@
+{
+  "name": "test-express-validator",
+  "version": "1.0.0",
+  "description": "test express validator",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node ./src/app.js",
+    "test": "nodemon ./src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodejsdeveloperskh/test-express-validator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nodejsdeveloperskh/test-express-validator/issues"
+  },
+  "homepage": "https://github.com/nodejsdeveloperskh/test-express-validator#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-validator": "^6.9.2",
+    "phone": "^2.4.20"
+  }
+}
