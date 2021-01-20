@@ -1,0 +1,21 @@
+version: "3.7"
+services:
+  test-express-validator:
+    image: "test-express-validator:v1"
+    # container_name: ${APP_NAME}
+    restart: always
+    volumes:
+      - type: bind
+        source: .
+        target: /usr/src/app
+        volume:
+          nocopy: true
+    build:
+      context: .
+      dockerfile: ./dev.Dockerfile
+    ports:
+      - "30000:${APP_PORT}"
+    environment:
+      NODE_ENV: development
+    env_file:
+      - ./.env
