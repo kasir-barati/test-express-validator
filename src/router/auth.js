@@ -6,12 +6,16 @@ const authValidator = require("../controller/auth.validator");
 
 router
   .route("/auth/login")
-  .post(authValidator.postLogin, validate, authController.postLogin);
+  .post(authValidator.phoneNumberValidator, validate, authController.postLogin);
 router
   .route("/auth/get-token")
-  .post(authValidator.postGetToken, validate, authController.postGetToken);
+  .post(
+    authValidator.refreshTokenValidator,
+    validate,
+    authController.postGetToken
+  );
 router
   .route("/auth/verify")
-  .post(authValidator.postVerify, validate, authController.postVerify);
+  .post(authValidator.verifyCodeValidator, validate, authController.postVerify);
 
 module.exports = router;

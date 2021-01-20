@@ -16,28 +16,28 @@ function arabicToEnglish(string) {
   return string.replace(/[٠-٩]/g, (digit) => "٠١٢٣٤٥٦٧٨٩".indexOf(digit));
 }
 
-function phoneValidator(phoneNumber) {
+function customPhoneValidator(phoneNumber) {
   return phone(phoneNumber, PHONE_VALIDATION_COUNTRY, false)[0];
 }
 
-module.exports.postGetToken = check("refreshToken")
+module.exports.refreshTokenValidator = check("refreshToken")
   .notEmpty({ ignore_whitespace: true })
   .withMessage("emptyRefreshToken")
   .bail();
 
-module.exports.postLogin = check("phoneNumber")
+module.exports.phoneNumberValidator = check("phoneNumber")
   .notEmpty({ ignore_whitespace: true })
   .withMessage("E_EMPTY_PHONE")
   .bail()
 
   .customSanitizer(persianToEnglish)
   .customSanitizer(arabicToEnglish)
-  .custom(phoneValidator)
+  .custom(customPhoneValidator)
   .withMessage("E_FORMAT_PHONE");
 
 // module.exports.postGetToken = check('refreshToken')
 
-module.exports.postVerify = check("verifyCode")
+module.exports.verifyCodeValidator = check("verifyCode")
   .notEmpty({ ignore_whitespace: true })
   .withMessage("E_EMPTY_VERIFYCODE")
   .bail()
