@@ -1,21 +1,40 @@
-const router = require("express").Router();
+const router = require('express').Router();
 
-const validate = require("../middleware/validate");
-const authController = require("../controller/auth");
-const authValidator = require("../controller/auth.validator");
+const validate = require('../middleware/validate');
+const authController = require('../controller/auth');
+const authValidator = require('../controller/auth.validator');
+
+// router
+//   .route('/auth/login2')
+//   .post(
+//     authValidator.passwordValidator.strict,
+//     validate,
+//     authController.postLogin,
+//   );
 
 router
-  .route("/auth/login2")
-  .post(authValidator.passwordValidator, validate, authController.postLogin);
-
+  .route('/auth/login')
+  .post(
+    authValidator.accessTokenValidator.strict,
+    authValidator.phoneNumberValidator.strict,
+    validate,
+    authController.postLogin,
+  );
 router
-  .route("/auth/login")
-  .post(authValidator.phoneNumberValidator, validate, authController.postLogin);
+  .route('/auth/get-token')
+  .post(
+    authValidator.refreshTokenValidator.optional,
+    validate,
+    authController.upsertUser,
+    authController.postGetToken,
+  );
 router
-  .route("/auth/get-token")
-  .post(authValidator.verifyJwtToken, validate, authController.postGetToken);
-router
-  .route("/auth/verify")
-  .post(authValidator.verifyCodeValidator, validate, authController.postVerify);
+  .route('/auth/verify')
+  .post(
+    authValidator.accessTokenValidator.strict,
+    authValidator.verifyCodeValidator.strict,
+    validate,
+    authController.postVerify,
+  );
 
 module.exports = router;

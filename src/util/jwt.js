@@ -1,11 +1,22 @@
-const jsonwebtoken = require("jsonwebtoken");
+const jsonwebtoken = require('jsonwebtoken');
+
+const BaseError = require('./base-error');
 
 const {
-  jwtSecretKey: JWT_SECRET_KEY,
-  jwtAlgorithms: JWT_ALGORITHM,
+  accessTokenSecretKey: ACCESS_TOKEN_SECRET_KEY,
+  refreshTokenSecretKey: REFRESH_TOKEN_SECRET_KEY,
+  accessTokenAlgorithm: ACCESS_TOKEN_ALGORITHM,
+  refreshTokenAlgorithm: REFRESH_TOKEN_ALGORITHM,
   accessTokenExpiresIn: ACCESS_TOKEN_EXPIRES_IN,
   refreshTokenExpiresIn: REFRESH_TOKEN_EXPIRES_IN,
-} = require("../config");
+} = require('../config');
+
+class UnAuthenticated extends BaseError {
+  /**@param {Error} error */
+  constructor(error) {
+    super('E_UNAUTHENTICATED', 401, false, error, false);
+  }
+}
 
 /**
  *
@@ -16,13 +27,20 @@ module.exports.verifyToken = (token, tokenType) => {
   return new Promise((resolve, reject) => {
     jsonwebtoken.verify(
       token,
-      JWT_SECRET_KEY,
+      tokenType === 'accessToken'
+        ? ACCESS_TOKEN_SECRET_KEY
+        : REFRESH_TOKEN_SECRET_KEY,
       {
-        algorithms: JWT_ALGORITHM,
+        // algorithms:
+        //   tokenType === 'accessToken'
+        //     ? ACCESS_TOKEN_ALGORITHM
+        //     : REFRESH_TOKEN_ALGORITHM,
       },
       (error, decoded) => {
-        error ? reject(error) : resolve(decoded?.userId ?? null);
-      }
+        error
+          ? reject(new UnAuthenticated(error))
+          : resolve(decoded?.userId);
+      },
     );
   });
 };
@@ -35,18 +53,24 @@ module.exports.verifyToken = (token, tokenType) => {
 module.exports.signToken = (userId, tokenType) => {
   return new Promise((resolve, reject) => {
     jsonwebtoken.sign(
-      userId,
-      JWT_SECRET_KEY,
+      { userId },
+      tokenType === 'accessToken'
+        ? ACCESS_TOKEN_SECRET_KEY
+        : REFRESH_TOKEN_SECRET_KEY,
       {
-        algorithm: JWT_ALGORITHM,
+        // algorithm:
+        //   tokenType === 'accessToken'
+        //     ? ACCESS_TOKEN_ALGORITHM
+        //     : REFRESH_TOKEN_ALGORITHM,
         expiresIn:
-          tokenType === "accessToken"
-            ? ACCESS_TOKEN_EXPIRES_IN
-            : REFRESH_TOKEN_EXPIRES_IN,
+          tokenType === 'accessToken'
+            ? Number(ACCESS_TOKEN_EXPIRES_IN)
+            : Number(REFRESH_TOKEN_EXPIRES_IN),
       },
       (error, encoded) => {
+        console.error(error);
         error ? reject(error) : resolve(encoded);
-      }
+      },
     );
   });
 };
