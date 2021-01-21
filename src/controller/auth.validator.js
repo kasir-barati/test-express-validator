@@ -26,6 +26,8 @@ module.exports.refreshTokenValidator = check("refreshToken")
   .bail();
 
 module.exports.phoneNumberValidator = check("phoneNumber")
+  .exists({ checkFalsy: true, checkNull: true })
+  .withMessage("E_EMPTY_PHONE")
   .notEmpty({ ignore_whitespace: true })
   .withMessage("E_EMPTY_PHONE")
   .bail()
@@ -38,6 +40,8 @@ module.exports.phoneNumberValidator = check("phoneNumber")
 // module.exports.postGetToken = check('refreshToken')
 
 module.exports.verifyCodeValidator = check("verifyCode")
+  .exists({ checkFalsy: true, checkNull: true })
+  .withMessage("E_EMPTY_VERIFYCODE")
   .notEmpty({ ignore_whitespace: true })
   .withMessage("E_EMPTY_VERIFYCODE")
   .bail()
@@ -52,6 +56,8 @@ module.exports.verifyCodeValidator = check("verifyCode")
   .withMessage("E_FORMAT_VERIFYCODE");
 
 module.exports.passwordValidator = check("password")
+  .exists({ checkFalsy: true, checkNull: true })
+  .withMessage("E_EMPTY_PASSWORD")
   .notEmpty({ ignore_whitespace: true })
   .withMessage("E_EMPTY_PASSWORD")
   .bail()
