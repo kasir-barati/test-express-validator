@@ -1,7 +1,7 @@
 const phone = require("phone");
 const { check, oneOf, header, body } = require("express-validator");
 
-const {} = require("../util/jwt");
+const { verifyToken } = require("../util/jwt");
 
 const {
   jwtBodyKey: ACCESS_TOKEN_BODY_KEY,
@@ -38,21 +38,27 @@ module.exports.phoneNumberValidator = check("phoneNumber")
 
 // module.exports.postGetToken = check('refreshToken')
 
-module.exports.verifyCodeValidator = check("verifyCode")
-  .exists({ checkFalsy: true, checkNull: true })
-  .withMessage("E_EMPTY_VERIFYCODE")
-  .notEmpty({ ignore_whitespace: true })
-  .withMessage("E_EMPTY_VERIFYCODE")
-  .bail()
+const verifyCodeValidator = () =>
+  check("verifyCode")
+    .exists({ checkFalsy: true, checkNull: true })
+    .withMessage("E_EMPTY_VERIFYCODE")
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("E_EMPTY_VERIFYCODE")
+    .bail()
 
-  .customSanitizer(persianToEnglish)
-  .customSanitizer(arabicToEnglish)
-  .matches(/[0-9]/)
-  .isLength({
-    max: VERIFICATION_CODE_LEN,
-    min: VERIFICATION_CODE_LEN,
-  })
-  .withMessage("E_FORMAT_VERIFYCODE");
+    .customSanitizer(persianToEnglish)
+    .customSanitizer(arabicToEnglish)
+    .matches(/[0-9]/)
+    .isLength({
+      max: VERIFICATION_CODE_LEN,
+      min: VERIFICATION_CODE_LEN,
+    })
+    .withMessage("E_FORMAT_VERIFYCODE");
+
+module.exports.verifyCodeValidator = {
+  strict: verifyCodeValidator(),
+  optional: verifyCodeValidator().optional(),
+};
 
 module.exports.passwordValidator = check("password")
   .exists({ checkFalsy: true, checkNull: true })
@@ -91,7 +97,9 @@ module.exports.accessTokenValidator = oneOf([
     .withMessage("E_UNAUTHENTICATED")
     .bail()
 
-    .custom(verifyAccessToken)
+    .custom((accessToken, { req }) => {
+      verifyToken(accessToken, "accessToken");
+    })
     .withMessage("E_UNAUTHENTICATED"),
   body(ACCESS_TOKEN_BODY_KEY)
     .exists({ checkFalsy: true, checkNull: true })
