@@ -21,10 +21,10 @@ module.exports.verifyToken = (token, tokenType) => {
         algorithms: JWT_ALGORITHM,
       },
       (error, decoded) => {
-        error ? reject(error) ? resolve(decoded?.userId ?? null)
+        error ? reject(error) : resolve(decoded?.userId ?? null);
       }
     );
-  })
+  });
 };
 
 /**
@@ -38,7 +38,6 @@ module.exports.signToken = (userId, tokenType) => {
       userId,
       JWT_SECRET_KEY,
       {
-
         algorithm: JWT_ALGORITHM,
         expiresIn:
           tokenType === "accessToken"
