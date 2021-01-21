@@ -1,7 +1,11 @@
 const phone = require("phone");
-const { check } = require("express-validator");
+const { check, oneOf, header, body } = require("express-validator");
+
+const {} = require("../util/jwt");
 
 const {
+  jwtBodyKey: ACCESS_TOKEN_BODY_KEY,
+  jwtHeaderKey: ACCESS_TOKEN_HEADER_KEY,
   verificationCodeLen: VERIFICATION_CODE_LEN,
   phoneValidationCountry: PHONE_VALIDATION_COUNTRY,
 } = require("../config");
@@ -19,11 +23,6 @@ function arabicToEnglish(string) {
 function customPhoneValidator(phoneNumber) {
   return phone(phoneNumber, PHONE_VALIDATION_COUNTRY, false)[0];
 }
-
-module.exports.refreshTokenValidator = check("refreshToken")
-  .notEmpty({ ignore_whitespace: true })
-  .withMessage("emptyRefreshToken")
-  .bail();
 
 module.exports.phoneNumberValidator = check("phoneNumber")
   .exists({ checkFalsy: true, checkNull: true })
@@ -81,3 +80,28 @@ module.exports.passwordValidator = check("password")
     req.body.password = password;
     return true;
   });
+
+module.exports.accessTokenValidator = oneOf([
+  header(ACCESS_TOKEN_HEADER_KEY)
+    .exists({ checkFalsy: true, checkNull: true })
+    .withMessage("E_UNAUTHENTICATED")
+    .bail()
+
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("E_UNAUTHENTICATED")
+    .bail()
+
+    .custom(verifyAccessToken)
+    .withMessage("E_UNAUTHENTICATED"),
+  body(ACCESS_TOKEN_BODY_KEY)
+    .exists({ checkFalsy: true, checkNull: true })
+    .withMessage("E_UNAUTHENTICATED")
+    .bail()
+
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("E_UNAUTHENTICATED")
+    .bail()
+
+    .custom(verifyAccessToken)
+    .withMessage("E_UNAUTHENTICATED"),
+]);

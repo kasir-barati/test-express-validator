@@ -13,11 +13,7 @@ router
   .post(authValidator.phoneNumberValidator, validate, authController.postLogin);
 router
   .route("/auth/get-token")
-  .post(
-    authValidator.refreshTokenValidator,
-    validate,
-    authController.postGetToken
-  );
+  .post(authValidator.verifyJwtToken, validate, authController.postGetToken);
 router
   .route("/auth/verify")
   .post(authValidator.verifyCodeValidator, validate, authController.postVerify);
