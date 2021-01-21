@@ -1,5 +1,5 @@
 const phone = require("phone");
-const { check, oneOf, header, body } = require("express-validator");
+const { check } = require("express-validator");
 
 const { verifyToken } = require("../util/jwt");
 
@@ -23,22 +23,28 @@ function customPhoneValidator(phoneNumber) {
   return phone(phoneNumber, PHONE_VALIDATION_COUNTRY, false)[0];
 }
 
-module.exports.phoneNumberValidator = check("phoneNumber")
-  .exists({ checkFalsy: true, checkNull: true })
-  .withMessage("E_EMPTY_PHONE")
-  .notEmpty({ ignore_whitespace: true })
-  .withMessage("E_EMPTY_PHONE")
-  .bail()
+function phoneNumberValidator() {
+  return check("phoneNumber")
+    .exists({ checkFalsy: true, checkNull: true })
+    .withMessage("E_EMPTY_PHONE")
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("E_EMPTY_PHONE")
+    .bail()
 
-  .customSanitizer(persianToEnglish)
-  .customSanitizer(arabicToEnglish)
-  .custom(customPhoneValidator)
-  .withMessage("E_FORMAT_PHONE");
+    .customSanitizer(persianToEnglish)
+    .customSanitizer(arabicToEnglish)
+    .custom(customPhoneValidator)
+    .withMessage("E_FORMAT_PHONE");
+}
 
+module.exports.phoneNumberValidator = {
+  strict: phoneNumberValidator(),
+  optional: phoneNumberValidator().optional(),
+};
 // module.exports.postGetToken = check('refreshToken')
 
-const verifyCodeValidator = () =>
-  check("verifyCode")
+function verifyCodeValidator() {
+  return check("verifyCode")
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage("E_EMPTY_VERIFYCODE")
     .notEmpty({ ignore_whitespace: true })
@@ -53,41 +59,49 @@ const verifyCodeValidator = () =>
       min: VERIFICATION_CODE_LEN,
     })
     .withMessage("E_FORMAT_VERIFYCODE");
+}
 
 module.exports.verifyCodeValidator = {
   strict: verifyCodeValidator(),
   optional: verifyCodeValidator().optional(),
 };
 
-module.exports.passwordValidator = check("password")
-  .exists({ checkFalsy: true, checkNull: true })
-  .withMessage("E_EMPTY_PASSWORD")
-  .notEmpty({ ignore_whitespace: true })
-  .withMessage("E_EMPTY_PASSWORD")
-  .bail()
+function passwordValidator() {
+  return check("password")
+    .exists({ checkFalsy: true, checkNull: true })
+    .withMessage("E_EMPTY_PASSWORD")
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("E_EMPTY_PASSWORD")
+    .bail()
 
-  .matches(/(?=.*[A-Z].*[A-Z])/)
-  .withMessage("E_UPPERCASE_LETTER_PASSWORD")
+    .matches(/(?=.*[A-Z].*[A-Z])/)
+    .withMessage("E_UPPERCASE_LETTER_PASSWORD")
 
-  .matches(/(?=.*[a-z].*[a-z].*[a-z])/)
-  .withMessage("E_LOWERCASE_LETTER_PASSWORD")
+    .matches(/(?=.*[a-z].*[a-z].*[a-z])/)
+    .withMessage("E_LOWERCASE_LETTER_PASSWORD")
 
-  .matches(/(?=.*[!@#$&*])/)
-  .withMessage("E_SPECIAL_CHARACTER_PASSWORD")
+    .matches(/(?=.*[!@#$&*])/)
+    .withMessage("E_SPECIAL_CHARACTER_PASSWORD")
 
-  .matches(/(?=.*[0-9].*[0-9])/)
-  .withMessage("E_NUMBER_PASSWORD")
+    .matches(/(?=.*[0-9].*[0-9])/)
+    .withMessage("E_NUMBER_PASSWORD")
 
-  .isLength({ min: 8 })
-  .withMessage("E_MIN_LENGTH_PASSWORD")
+    .isLength({ min: 8 })
+    .withMessage("E_MIN_LENGTH_PASSWORD")
 
-  .custom((password, { req }) => {
-    req.body.password = password;
-    return true;
-  });
+    .custom((password, { req }) => {
+      req.body.password = password;
+      return true;
+    });
+}
 
-module.exports.accessTokenValidator = oneOf([
-  header(ACCESS_TOKEN_HEADER_KEY)
+module.exports.passwordValidator = {
+  strict: passwordValidator(),
+  optional: passwordValidator().optional(),
+};
+
+function accessTokenValidator() {
+  return check(ACCESS_TOKEN_HEADER_KEY)
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage("E_UNAUTHENTICATED")
     .bail()
@@ -97,18 +111,17 @@ module.exports.accessTokenValidator = oneOf([
     .bail()
 
     .custom((accessToken, { req }) => {
-      verifyToken(accessToken, "accessToken");
+      try {
+        req.userId = verifyToken(accessToken, "accessToken");
+        return true;
+      } catch {
+        return false;
+      }
     })
-    .withMessage("E_UNAUTHENTICATED"),
-  body(ACCESS_TOKEN_BODY_KEY)
-    .exists({ checkFalsy: true, checkNull: true })
-    .withMessage("E_UNAUTHENTICATED")
-    .bail()
+    .withMessage("E_UNAUTHENTICATED");
+}
 
-    .notEmpty({ ignore_whitespace: true })
-    .withMessage("E_UNAUTHENTICATED")
-    .bail()
-
-    .custom(verifyAccessToken)
-    .withMessage("E_UNAUTHENTICATED"),
-]);
+module.exports.accessTokenValidator = {
+  strict: accessTokenValidator(),
+  optional: accessTokenValidator().optional(),
+};
