@@ -4,7 +4,6 @@ const { check, oneOf, header, body } = require("express-validator");
 const { verifyToken } = require("../util/jwt");
 
 const {
-  jwtBodyKey: ACCESS_TOKEN_BODY_KEY,
   jwtHeaderKey: ACCESS_TOKEN_HEADER_KEY,
   verificationCodeLen: VERIFICATION_CODE_LEN,
   phoneValidationCountry: PHONE_VALIDATION_COUNTRY,
