@@ -1,8 +1,8 @@
 const { validationResult } = require('express-validator');
 
-const BaseError = require('../util/base-error');
+const ResponseError = require('../util/response-error');
 
-class UnProcessableEntity extends BaseError {
+class UnProcessableEntity extends ResponseError {
   constructor(validationsErrors) {
     super(
       'E_VALIDATION',

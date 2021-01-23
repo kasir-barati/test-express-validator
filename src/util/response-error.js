@@ -1,4 +1,4 @@
-module.exports = class BaseError extends (
+module.exports = class ResponseError extends (
   Error
 ) {
   /**
@@ -14,7 +14,7 @@ module.exports = class BaseError extends (
     status = 500,
     success = false,
     parent = null,
-    sendResult = false
+    sendResult = false,
   ) {
     super(message);
     this.message = message;

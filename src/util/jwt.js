@@ -1,6 +1,6 @@
 const jsonwebtoken = require('jsonwebtoken');
 
-const BaseError = require('./base-error');
+const ResponseError = require('./response-error');
 
 const {
   accessTokenSecretKey: ACCESS_TOKEN_SECRET_KEY,
@@ -11,7 +11,7 @@ const {
   refreshTokenExpiresIn: REFRESH_TOKEN_EXPIRES_IN,
 } = require('../config');
 
-class UnAuthenticated extends BaseError {
+class UnAuthenticated extends ResponseError {
   /**@param {Error} error */
   constructor(error) {
     super('E_UNAUTHENTICATED', 401, false, error, false);
