@@ -26,7 +26,7 @@ class UnAuthenticated extends ResponseError {
 module.exports.verifyToken = (token, tokenType) => {
   return new Promise((resolve, reject) => {
     jsonwebtoken.verify(
-      token,
+      token.split(' ')[1],
       tokenType === 'accessToken'
         ? ACCESS_TOKEN_SECRET_KEY
         : REFRESH_TOKEN_SECRET_KEY,
@@ -68,7 +68,7 @@ module.exports.signToken = (userId, tokenType) => {
             : Number(REFRESH_TOKEN_EXPIRES_IN),
       },
       (error, encoded) => {
-        console.error(error);
+        console.error('error: ', error);
         error ? reject(error) : resolve(encoded);
       },
     );
