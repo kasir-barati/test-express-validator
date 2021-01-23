@@ -43,7 +43,12 @@ function phoneNumberValidator() {
     .customSanitizer(persianToEnglish)
     .customSanitizer(arabicToEnglish)
     .custom(customPhoneValidator)
-    .withMessage('E_FORMAT_PHONE');
+    .withMessage('E_FORMAT_PHONE')
+
+    .custom((phoneNumber, { req }) => {
+      req.body.phoneNumber = phoneNumber;
+      return true;
+    });
 }
 
 module.exports.phoneNumberValidator = {
@@ -67,7 +72,12 @@ function verifyCodeValidator() {
       max: VERIFICATION_CODE_LEN,
       min: VERIFICATION_CODE_LEN,
     })
-    .withMessage('E_FORMAT_VERIFYCODE');
+    .withMessage('E_FORMAT_VERIFYCODE')
+
+    .custom((verifyCode, { req }) => {
+      req.body.verifyCode = verifyCode;
+      return true;
+    });
 }
 
 module.exports.verifyCodeValidator = {
@@ -133,6 +143,11 @@ module.exports.refreshTokenValidator = {
 
 function accessTokenValidator() {
   return check(ACCESS_TOKEN_HEADER_KEY)
+    .exists({ checkFalsy: true, checkNull: true })
+    .withMessage('E_UNAUTHENTICATED')
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage('E_UNAUTHENTICATED')
+
     .custom(async (accessToken, { req }) => {
       try {
         req.userId = await verifyToken(
@@ -141,7 +156,7 @@ function accessTokenValidator() {
         );
         return Promise.resolve();
       } catch (error) {
-        console.error(error);
+        console.error('error: ', error);
         return Promise.reject(error);
       }
     })
