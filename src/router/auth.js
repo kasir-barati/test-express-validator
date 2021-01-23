@@ -26,7 +26,7 @@ router
     authValidator.refreshTokenValidator.optional,
     validate,
     authController.upsertUser,
-    authController.postGetToken,
+    authController.getToken,
   );
 router
   .route('/auth/verify')

@@ -14,6 +14,7 @@ const config = {
   accessTokenExpiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
   refreshTokenExpiresIn:
     process.env.REFRESH_TOKEN_EXPIRES_IN,
+  otpCodesExpiresIn: 120_000,
 };
 
 module.exports = config;

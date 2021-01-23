@@ -1,10 +1,18 @@
 const { signToken } = require('../util/jwt');
+const {
+  saveOtpCode,
+  deleteOtpCode,
+} = require('../util/otp');
 
 /**@type {import("express").RequestHandler} */
 module.exports.postLogin = (req, res, next) => {
+  let otpCode = Math.ceil(Math.random() * 1_000_000);
+
+  saveOtpCode(req.userId, String(otpCode));
+
   res.status(200).json({
     success: true,
-    data: '123456',
+    data: otpCode,
     error: null,
   });
 };
@@ -12,12 +20,12 @@ module.exports.postLogin = (req, res, next) => {
 module.exports.upsertUser = async (req, res, next) => {
   if (req.userId) return next();
 
-  req.userId = 123345546;
+  req.userId = Math.ceil(Math.random() * 1_000_000);
   next();
 };
 
 /**@type {import("express").RequestHandler} */
-module.exports.postGetToken = async (req, res, next) => {
+module.exports.getToken = async (req, res, next) => {
   let accessToken = await signToken(
     req.userId,
     'accessToken',
@@ -38,11 +46,20 @@ module.exports.postGetToken = async (req, res, next) => {
 
 /**@type {import("express").RequestHandler} */
 module.exports.postVerify = (req, res, next) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      verifyCode: '',
-    },
-    error: null,
-  });
+  const { verifyCode } = req.body;
+
+  try {
+    deleteOtpCode(req.userId, verifyCode);
+    res.status(200).json({
+      success: true,
+      data: null,
+      error: null,
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      data: null,
+      error: error.message,
+    });
+  }
 };
