@@ -36,6 +36,8 @@ function phoneNumberValidator() {
   return check('phoneNumber')
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('E_EMPTY_PHONE')
+    .bail()
+
     .notEmpty({ ignore_whitespace: true })
     .withMessage('E_EMPTY_PHONE')
     .bail()
@@ -61,6 +63,8 @@ function verifyCodeValidator() {
   return check('verifyCode')
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('E_EMPTY_VERIFYCODE')
+    .bail()
+
     .notEmpty({ ignore_whitespace: true })
     .withMessage('E_EMPTY_VERIFYCODE')
     .bail()
@@ -89,6 +93,8 @@ function passwordValidator() {
   return check('password')
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('E_EMPTY_PASSWORD')
+    .bail()
+
     .notEmpty({ ignore_whitespace: true })
     .withMessage('E_EMPTY_PASSWORD')
     .bail()
@@ -145,6 +151,8 @@ function accessTokenValidator() {
   return check(ACCESS_TOKEN_HEADER_KEY)
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('E_UNAUTHENTICATED')
+    .bail()
+
     .notEmpty({ ignore_whitespace: true })
     .withMessage('E_UNAUTHENTICATED')
 
