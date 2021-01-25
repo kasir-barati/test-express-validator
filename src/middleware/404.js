@@ -6,7 +6,8 @@
  */
 module.exports = (req, res, next) => {
   res.status(404).json({
+    success: false,
     data: null,
-    error: "E_PAGE_NOT_FOUND",
+    error: 'E_PAGE_NOT_FOUND',
   });
 };
