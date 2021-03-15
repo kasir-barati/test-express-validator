@@ -1,5 +1,5 @@
 const phone = require('phone');
-const { check } = require('express-validator');
+const { check, oneOf } = require('express-validator');
 
 const { verifyToken } = require('../util/jwt');
 
@@ -32,6 +32,10 @@ function customPhoneValidator(phoneNumber) {
   )[0];
 }
 
+function isUrl() {
+  return check('test').isURL().withMessage('E_FORMAT_URL');
+}
+
 function phoneNumberValidator() {
   return check('phoneNumber')
     .exists({ checkFalsy: true, checkNull: true })
@@ -52,12 +56,6 @@ function phoneNumberValidator() {
       return true;
     });
 }
-
-module.exports.phoneNumberValidator = {
-  strict: phoneNumberValidator(),
-  optional: phoneNumberValidator().optional(),
-};
-// module.exports.postGetToken = check('refreshToken')
 
 function verifyCodeValidator() {
   return check('verifyCode')
@@ -83,11 +81,6 @@ function verifyCodeValidator() {
       return true;
     });
 }
-
-module.exports.verifyCodeValidator = {
-  strict: verifyCodeValidator(),
-  optional: verifyCodeValidator().optional(),
-};
 
 function passwordValidator() {
   return check('password')
@@ -120,11 +113,6 @@ function passwordValidator() {
     });
 }
 
-module.exports.passwordValidator = {
-  strict: passwordValidator(),
-  optional: passwordValidator().optional(),
-};
-
 function refreshTokenValidator() {
   return check(REFRESH_TOKEN_KEY)
     .custom(async (refreshToken, { req }) => {
@@ -141,11 +129,6 @@ function refreshTokenValidator() {
     })
     .withMessage('E_UNAUTHENTICATED');
 }
-
-module.exports.refreshTokenValidator = {
-  strict: refreshTokenValidator(),
-  optional: refreshTokenValidator().optional(),
-};
 
 function accessTokenValidator() {
   return check(ACCESS_TOKEN_HEADER_KEY)
@@ -171,7 +154,56 @@ function accessTokenValidator() {
     .withMessage('E_UNAUTHENTICATED');
 }
 
-module.exports.accessTokenValidator = {
-  strict: accessTokenValidator(),
-  optional: accessTokenValidator().optional(),
+function emailValidator() {
+  return check('email')
+    .exists({ checkFalsy: true, checkNull: true })
+    .withMessage('E_EMPTY_EMAIL')
+    .bail()
+
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage('E_EMPTY_EMAIL')
+    .bail()
+
+    .normalizeEmail()
+    .isEmail()
+    .withMessage('E_FORMAT_EMAIL')
+
+    .custom((email, { req }) => {
+      req.body.email = email;
+    });
+}
+
+module.exports = {
+  emailValidator: {
+    strict: emailValidator(),
+    optional: emailValidator().optional(),
+  },
+  loginValidator: oneOf([
+    emailValidator(),
+    phoneNumberValidator(),
+  ]),
+  accessTokenValidator: {
+    strict: accessTokenValidator(),
+    optional: accessTokenValidator().optional(),
+  },
+  refreshTokenValidator: {
+    strict: refreshTokenValidator(),
+    optional: refreshTokenValidator().optional(),
+  },
+  passwordValidator: {
+    strict: passwordValidator(),
+    optional: passwordValidator().optional(),
+  },
+  verifyCodeValidator: {
+    strict: verifyCodeValidator(),
+    optional: verifyCodeValidator().optional(),
+  },
+  phoneNumberValidator: {
+    strict: phoneNumberValidator(),
+    optional: phoneNumberValidator().optional(),
+  },
+  isUrl: {
+    strict: test(),
+    optional: test().optional(),
+  },
 };

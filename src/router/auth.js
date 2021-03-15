@@ -37,4 +37,18 @@ router
     authController.postVerify,
   );
 
+router
+  .route('/is-url')
+  .post(
+    authValidator.isUrl.strict,
+    validate,
+    (req, res, next) => {
+      res.json({
+        success: true,
+        data: req.body,
+        error: null,
+      });
+    },
+  );
+
 module.exports = router;
