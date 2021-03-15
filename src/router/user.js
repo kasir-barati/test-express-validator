@@ -2,7 +2,7 @@ const router = require('express').Router();
 
 const validate = require('../middleware/validate');
 const userController = require('../controller/user');
-const authValidator = require('../controller/auth.validator');
+const authValidator = require('../validator/auth');
 
 router
   .route('/users')

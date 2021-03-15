@@ -1,6 +1,11 @@
+// @ts-check
 const phone = require('phone');
 const { check, oneOf } = require('express-validator');
 
+const {
+  arabicNumberToEnglish,
+  persianNumberToEnglish,
+} = require('../util/convertor');
 const { verifyToken } = require('../util/jwt');
 
 const {
@@ -12,28 +17,12 @@ const {
 
 // const REGX_PERSIAN_NAME = /^[کگۀی،تثجحخدغيًٌٍَُپٰچژ‌ء-ةذ-عف-ٔ ]+$/;
 
-function persianToEnglish(strnig) {
-  return strnig.replace(/[۰-۹]/g, (digit) =>
-    '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit),
-  );
-}
-
-function arabicToEnglish(string) {
-  return string.replace(/[٠-٩]/g, (digit) =>
-    '٠١٢٣٤٥٦٧٨٩'.indexOf(digit),
-  );
-}
-
 function customPhoneValidator(phoneNumber) {
   return phone(
     phoneNumber,
     PHONE_VALIDATION_COUNTRY,
     false,
   )[0];
-}
-
-function isUrl() {
-  return check('test').isURL().withMessage('E_FORMAT_URL');
 }
 
 function phoneNumberValidator() {
@@ -46,8 +35,8 @@ function phoneNumberValidator() {
     .withMessage('E_EMPTY_PHONE')
     .bail()
 
-    .customSanitizer(persianToEnglish)
-    .customSanitizer(arabicToEnglish)
+    .customSanitizer(persianNumberToEnglish)
+    .customSanitizer(arabicNumberToEnglish)
     .custom(customPhoneValidator)
     .withMessage('E_FORMAT_PHONE')
 
@@ -67,8 +56,8 @@ function verifyCodeValidator() {
     .withMessage('E_EMPTY_VERIFYCODE')
     .bail()
 
-    .customSanitizer(persianToEnglish)
-    .customSanitizer(arabicToEnglish)
+    .customSanitizer(persianNumberToEnglish)
+    .customSanitizer(arabicNumberToEnglish)
     .matches(/[0-9]/)
     .isLength({
       max: VERIFICATION_CODE_LEN,
@@ -201,9 +190,5 @@ module.exports = {
   phoneNumberValidator: {
     strict: phoneNumberValidator(),
     optional: phoneNumberValidator().optional(),
-  },
-  isUrl: {
-    strict: test(),
-    optional: test().optional(),
   },
 };

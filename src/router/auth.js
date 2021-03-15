@@ -1,8 +1,9 @@
+// @ts-check
 const router = require('express').Router();
 
 const validate = require('../middleware/validate');
 const authController = require('../controller/auth');
-const authValidator = require('../controller/auth.validator');
+const authValidator = require('../validator/auth');
 
 // router
 //   .route('/auth/login2')
@@ -35,20 +36,6 @@ router
     authValidator.verifyCodeValidator.strict,
     validate,
     authController.postVerify,
-  );
-
-router
-  .route('/is-url')
-  .post(
-    authValidator.isUrl.strict,
-    validate,
-    (req, res, next) => {
-      res.json({
-        success: true,
-        data: req.body,
-        error: null,
-      });
-    },
   );
 
 module.exports = router;
