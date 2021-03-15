@@ -16,7 +16,7 @@ router
   .route('/auth/login')
   .post(
     authValidator.accessTokenValidator.strict,
-    authValidator.phoneNumberValidator.strict,
+    authValidator.loginValidator,
     validate,
     authController.postLogin,
   );
